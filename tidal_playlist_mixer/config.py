@@ -6,6 +6,7 @@ from os import path, unlink
 from zoneinfo import ZoneInfo
 from dataclasses import dataclass, asdict
 import json
+from datetime import datetime
 from typing import Self
 
 CLI_ENVVAR_PREFIX = "MIXER"
@@ -20,9 +21,6 @@ class Config:
     CONFIG_DIR_ENV = f"{CLI_ENVVAR_PREFIX}_CONFIG_DIR"
     CACHE_DIR_ENV = f"{CLI_ENVVAR_PREFIX}_CACHE_DIR"
     TMEZONE_ENV = f"{CLI_ENVVAR_PREFIX}_TIMEZONE"
-    SPOTIFY_CLIENT_ID_ENV = f"{CLI_ENVVAR_PREFIX}_SPOTIFY_CLIENT_ID"
-    SPOTIFY_CLIENT_SECRET_ENV = f"{CLI_ENVVAR_PREFIX}_SPOTIFY_CLIENT_SECRET"
-    SPOTIFY_REDIRECT_URI_ENV = f"{CLI_ENVVAR_PREFIX}_SPOTIFY_REDIRECT_URI"
 
     config_dir: str = None
     cache_dir: str = None
@@ -35,10 +33,11 @@ class UserConfig:
     User related config file
     """
 
-    user_id: str
-    spotify_client_id: str
-    spotify_client_secret: str
-    spotify_client_redirect_uri: str
+    user_id: int
+    token_type: str
+    access_token: str
+    refresh_token: str | None
+    expiry_time: datetime | None
 
     @classmethod
     def store_user_config(cls: type, user_config: Self) -> None:
@@ -50,6 +49,8 @@ class UserConfig:
 
         with open(user_config_path, "w", encoding="utf8") as f:
             user_config_json = asdict(user_config)
+            if user_config.expiry_time is not None:
+                user_config_json["expiry_time"] = user_config.expiry_time.isoformat()
             f.write(json.dumps(user_config_json))
 
     @classmethod
@@ -65,6 +66,9 @@ class UserConfig:
 
         with open(user_config_path, "r", encoding="utf8") as f:
             user_config_json = json.load(f)
+            expiry_time = user_config_json.get("expiry_time")
+            if expiry_time is not None:
+                user_config_json["expiry_time"] = datetime.fromisoformat(expiry_time)
             user_config = UserConfig(**user_config_json)
 
         return user_config

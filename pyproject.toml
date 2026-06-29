@@ -1,19 +1,19 @@
 [tool.poetry]
-name = "playlist-mixer"
+name = "tidal-playlist-mixer"
 version = "0.0.0"
 # Version will be overwritten by pipeline
-description = "Playlist Mixer for Spotify"
-authors = ["Jan Dittrich <mail@jand.one>"]
+description = "Playlist Mixer for Tidal"
+authors = ["Jan Dittrich <mail@jand.one>", "Jakob Friedrich <friedrich1703@outlook.de>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.13"
-spotipy = "^2.24.0"
+tidalapi = "^0.8.11"
 click = "^8.1.7"
 truststore = "^0.10.1"
 
 [tool.poetry.scripts]
-playlist-mixer = "playlist_mixer.cli:main"
+tidal-playlist-mixer = "tidal_playlist_mixer.cli:main"
 
 [build-system]
 requires = ["poetry-core"]
